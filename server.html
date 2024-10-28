@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .user {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+   
+    <div id="user-list"></div>
+
+    <script>
+        const fetchUsers = async () => {
+            const query = `
+              {
+                users {
+                  id
+                  title
+                  description
+                  levels
+                }
+              }
+            `;
+            
+            try {
+                const response = await fetch('http://localhost:4000/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query }),
+                });
+                const data = await response.json();
+                displayUsers(data.data.users);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        const displayUsers = (users) => {
+            const userList = document.getElementById('user-list');
+            userList.innerHTML = ''; // Clear existing content
+
+            users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user';
+                userDiv.innerHTML = `
+                    <h3>${user.title} (ID: ${user.id})</h3>
+                    <p>${user.description}</p>
+                    <p>Levels: ${user.levels}</p>
+                `;
+                userList.appendChild(userDiv);
+            });
+        };
+
+        // Fetch users when the page loads
+        window.onload = fetchUsers;
+    </script>
+</body>
+</html>
